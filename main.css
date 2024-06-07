@@ -43,7 +43,7 @@ header {
 header > h1 {
     order: 2;
     flex: auto;
-    margin: 3px 0 10px 10px;
+    margin: 3px 0 0px 0px;
     font-size: 32px;
     height: 60px;
     line-height: 60px;
@@ -67,6 +67,7 @@ header > h1 {
 }
 
 #saveInfoBtn,
+#guideButton,
 #submitComment {
     order: 1;
     flex: none;
@@ -94,6 +95,7 @@ header > h1 {
 }
 
 #menuBtn:hover,
+#guideButton:hover,
 #saveInfoBtn:hover,
 #submitComment:hover,
 #addMarkerBtn:hover {
@@ -243,6 +245,7 @@ header > h1 {
 }
 
 #filterList {
+    overflow: auto;
     order: 1;
     flex: auto;
     width: 100%;
@@ -304,7 +307,7 @@ header > h1 {
 #Infopopup > h2 {
     order: 2;
     flex: auto;
-    margin: 0px 0 10px 10px;
+    margin: 0px 0px 0px 5px;
     font-size: 24px;
     max-height: 30%;
     height: 60px;
@@ -316,8 +319,15 @@ header > h1 {
     overflow-y:auto;
 }
 
+#description {
+    margin: 0px;
+}
 
 /* 评论区 */
+#Infopopup {
+    overflow:auto;
+}
+
 #description {
     padding: 10px;
     border: 1px solid #ddd;

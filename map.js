@@ -8,14 +8,15 @@ class LocalMap {
      * 构造函数
      * @param {Array} markerList marker数据列表 
      */
-    constructor(markerList) {
+    constructor(markerList, center) {
         // map实例
         this.mapObj = new AMap.Map('map', {
             viewMode: '2D', // 默认使用 2D 模式，如果希望使用带有俯仰角的 3D 模式，请设置 viewMode: '3D'
-            center: [121.478475,31.168554],
+            center: center,
             zoom: 18.6,
             showLabel: true
-        });
+        }
+    );
 
         // 添加定位控件
         // AMap.plugin('AMap.Geolocation', () => {
@@ -48,7 +49,7 @@ class LocalMap {
                 map: this.mapObj,
                 offset: new AMap.Pixel(-9.5, -31),
                 icon: new AMap.Icon({
-                    image: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png"
+                    image: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
                 }) 
             });
             console.log(marker._opts.title)
@@ -59,10 +60,6 @@ class LocalMap {
         }
         this.addButton = document.getElementById('addMarkerBtn');
         document.getElementById('addMarkerBtn').addEventListener('click', this.addMarker.bind(this));
-        // // 添加按钮
-        // this.addButton = document.createElement('button');
-        // this.addButton.addEventListener('click', this.addMarker.bind(this));
-        
         document.getElementById('confirmButton').addEventListener('click', this.confirmAdd.bind(this));
         this.confirmButton = document.createElement('button');
         this.confirmButton.addEventListener('click', this.confirmAdd.bind(this));
@@ -104,24 +101,26 @@ class LocalMap {
     uploadComments(ev) {
         let commentCon = document.getElementById('commentUpload').value
         let temp = {}
-        temp = {
-            "comment": commentCon,
-            "pointId": this.selectedMarkerID
+        if (commentCon !== ''){
+            temp = {
+                "comment": commentCon,
+                "pointId": this.selectedMarkerID
+            }
+            fetch("http://8.136.117.89:3000/submitcomment", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(temp)
+            })
+            .then(response => {
+                // 处理服务器响应
+                console.log("Points saved successfully!");
+            })
+            .catch(error => console.error(error));
+            console.log(this.selectedMarkerID)
+            this.hidePopup(this)
         }
-        fetch("http://8.136.117.89:3000/submitcomment", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(temp)
-        })
-        .then(response => {
-            // 处理服务器响应
-            console.log("Points saved successfully!");
-        })
-        .catch(error => console.error(error));
-        console.log(this.selectedMarkerID)
-        this.hidePopup(this)
     }
 
     /** 
@@ -152,7 +151,7 @@ class LocalMap {
 
         console.log(JSON.stringify([locArr[locArr.length - 1]]))
         let temp = [];
-        temp.push(locArr[locArr.length - 1])
+        temp.push(locArr[locArr.length - 1]);
         
         fetch("http://8.136.117.89:3000/save", {
             method: "POST",
@@ -164,10 +163,14 @@ class LocalMap {
         .then(response => {
             // 处理服务器响应
             console.log("Points saved successfully!");
+            temp = this.tempmarker.getPosition();
+            initMap(temp)
         })
         .catch(error => console.error(error));
-        this.updateMarkers(locArr)
+        // this.updateMarkers(locArr)
         confirmButton.style.display = 'none';
+        this.addButton.style.display = 'block';
+
     }
 
     /**
@@ -188,7 +191,6 @@ class LocalMap {
             draggable: true // 允许拖拽
         });
         this.tempmarker.on('click', (ev) => this.onMarkerClick(ev));
-        // this.markers.push(marker);
     }
     
     /**
@@ -245,7 +247,16 @@ class LocalMap {
 
         // 修改名字和描述
         infopopup.querySelector('h2:nth-child(1)').textContent = locArr[id].title;
-        // descriptionDiv.textContent = locArr[id].comments;
+        fetch(`http://8.136.117.89:3000/fetchcomments?pointId=${id}`)
+        .then(response => response.json())
+        .then(data => {
+            locArr[id].comments = data;
+        })
+        .then(data => {
+            console.log(locArr[id].comments)
+            displayComments()
+        })
+        .catch(error => console.error('Error:', error));        
 
         function displayComments(){
             const commentList = document.getElementById('commentList');
@@ -258,7 +269,10 @@ class LocalMap {
             });
         }
         // document.addEventListener('DOMContentLoaded', displayComments);
-        displayComments()
+        
+        document.getElementById("guideButton").addEventListener("click", function() {
+            window.location.href = `https://uri.amap.com/marker?position=${locArr[id].position[0]},${locArr[id].position[1]}&name=${locArr[id].title}&src=NYUSHmap&coordinate=gaode&callnative=1`;
+        });
         Infopopup.style.display = 'block';
         overlay.style.display = 'block';
         document.getElementById('overlay').addEventListener('click', this.hidePopup.bind(this));

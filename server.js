@@ -10,6 +10,8 @@ const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'mapdb';
 const collectionName = 'points';
 
+const pointsCount = db.points.countDocuments()
+
 app.use(cors());
 
 // 使用中间件解析请求体
@@ -28,6 +30,47 @@ async function connectToDatabase() {
             try {
                 const result = await db.collection(collectionName).find().toArray();
                 res.json(result);
+
+            } catch (err) {
+                console.error(err);
+                res.status(500).send('Internal Server Error');
+            }
+        });
+
+        app.get('/fetchcomments', async (req, res) => {
+            try {
+                const pointId = parseInt(req.query.pointId);
+                const result = await db.collection(collectionName).findOne({ id: pointId });
+                if (result) {
+                    res.json(result.comments || []);
+                } else {
+                    res.status(404).send('Point not found');
+                }
+            } catch (err) {
+                console.error(err);
+                res.status(500).send('Internal Server Error');
+            }
+        });
+
+        app.post('/delete', async (req, res) => {
+            try {
+                const pointId = req.body.pointId; // 从请求体中获取要删除的点的ID
+                const parsedPointId = parseInt(pointId, 10); // 将字符串转换为整数
+                
+                // 删除指定的点
+                const deleteResult = await db.collection(collectionName).deleteOne({ id: parsedPointId });
+                pointsCount -= 1;
+                if (deleteResult.deletedCount === 1) {
+                    // 更新所有大于被删除点ID的点ID
+                    const updateResult = await db.collection(collectionName).updateMany(
+                        { id: { $gt: parsedPointId } }, // 找到所有id大于删除点id的点
+                        { $inc: { id: -1 } } // 将它们的id减1
+                    );
+        
+                    res.json({ message: "Point deleted and IDs updated successfully!" });
+                } else {
+                    res.status(404).json({ message: "Point not found" });
+                }
             } catch (err) {
                 console.error(err);
                 res.status(500).send('Internal Server Error');
@@ -37,7 +80,10 @@ async function connectToDatabase() {
         app.post('/save', async (req, res) => {
             try {
                 const newPoints = req.body;
+                newPoints[0].id = pointsCount;
                 const result = await db.collection(collectionName).insertMany(newPoints);
+                res.json("Point Saved Successfully!");
+                pointsCount += 1;
             } catch (err) {
                 console.error(err);
                 res.status(500).send('Internal Server Error');

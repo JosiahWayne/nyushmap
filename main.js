@@ -20,8 +20,9 @@ let mapObj;
 /**
  * 地图加载函数
  */
-function initMap() {
-    console.log(locArr)
+function initMap(center) {
+    // console.log(locArr)
+    cent = center || [121.478475,31.168554];
     fetch('http://8.136.117.89:3000/points')
     .then(response => response.json())
     .then(data => {
@@ -37,8 +38,8 @@ function initMap() {
             // console.log(point)
             locArr.push(point)
         };
-        console.log(locArr)
-        mapObj = new LocalMap(locArr);
+        // console.log(locArr)
+        mapObj = new LocalMap(locArr, cent);
     })
     .catch(error => console.error('Error:', error));
 }
