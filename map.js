@@ -198,8 +198,7 @@ class LocalMap {
      * @param {Object} ev
      */
     confirmAdd(ev) {
-        ev.stopPropagation();
-        console.log(ev)
+        document.getElementById('overlay').addEventListener('click', this.hidePopup.bind(this));
         this.updateMarkers(locArr)
         // 显示弹窗
         popup.style.display = 'block';
@@ -212,14 +211,11 @@ class LocalMap {
      * @param {Object} ev 事件
      */
     onMarkerClick(ev) {
-        // this.showInfoWindow(ev);
         let id = this.markers.indexOf(ev.target);
         this.onSelected(id);
     }
 
     /**
-     * 显示信息窗体
-     * 发起异步请求获取地点百科信息
      * @param {Object} ev 事件
      */
     showInfoWindow(ev) {
@@ -270,9 +266,12 @@ class LocalMap {
         }
         // document.addEventListener('DOMContentLoaded', displayComments);
         
-        document.getElementById("guideButton").addEventListener("click", function() {
+        document.getElementById("guideButtonByGaoDe").addEventListener("click", function() {
             window.location.href = `https://uri.amap.com/marker?position=${locArr[id].position[0]},${locArr[id].position[1]}&name=${locArr[id].title}&src=NYUSHmap&coordinate=gaode&callnative=1`;
         });
+        // document.getElementById("guideButtonByApple").addEventListener("click", function() {
+        //     window.location.href = `http://maps.apple.com/?daddr=${locArr[id].position[0]},${locArr[id].position[1]}`;
+        // });
         Infopopup.style.display = 'block';
         overlay.style.display = 'block';
         document.getElementById('overlay').addEventListener('click', this.hidePopup.bind(this));

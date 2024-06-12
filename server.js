@@ -10,8 +10,6 @@ const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'mapdb';
 const collectionName = 'points';
 
-const pointsCount = db.points.countDocuments()
-
 app.use(cors());
 
 // 使用中间件解析请求体
@@ -21,11 +19,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 async function connectToDatabase() {
     let client;
     try {
-        client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
+        client = await MongoClient.connect(mongoUrl);
         console.log('Connected to the database');
         const db = client.db(dbName);
+        var pointsCount = db.collection(collectionName).countDocuments();
 
         // 设置路由
+        app.get('/pointsnum', async (req, res) => {
+            try {
+                const result = await db.collection(collectionName).countDocuments();
+                res.json(result);
+
+            } catch (err) {
+                console.error(err);
+                res.status(500).send('Internal Server Error');
+            }
+        });
         app.get('/points', async (req, res) => {
             try {
                 const result = await db.collection(collectionName).find().toArray();

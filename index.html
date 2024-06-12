@@ -42,16 +42,19 @@
 <!-- 在 body 标签之后添加一个隐藏的弹窗 -->
 <div id="popup" style="display: none;">
     <h2>Create a new marker.</h2>
-    <p>Name</p>
+    <h3>Name</h3>
     <input type="text" id="markerInfo" placeholder="Input Marker Title">
-    <p>Description</p>
+    <h3>Description</h3>
     <input type="text" id="markerDetail" placeholder="Input some details">
     <button id="saveInfoBtn">Saveinfo</button>
 </div>
 
 <div id="Infopopup" style="display: none;">
     <h2>Name</h2>
-    <button id="guideButton">Take me there</button>
+    <div class = "button-container">
+        <button id="guideButtonByGaoDe">Take me there by GaoDe Map</button>
+        <!-- <button id="guideButtonByApple">Take me there by Apple Map</button> -->
+    </div>
     <h3>Comments</h3>
     <div id="description">
         <ul id="commentList">

@@ -66,8 +66,26 @@ header > h1 {
     cursor: pointer;
 }
 
+.button-container {
+    display: flex;
+}
+
+#guideButtonByGaoDe,
+#guideButtonByApple {
+    display: inline-block;
+    order: 1;
+    flex: none;
+    width: 97%;
+    font-size: 16px;
+    color: #fff;
+    background: #57068c;
+    border: none;
+    margin: 3px;
+    padding: 10px;
+    cursor: pointer;
+}
+
 #saveInfoBtn,
-#guideButton,
 #submitComment {
     order: 1;
     flex: none;
@@ -95,7 +113,8 @@ header > h1 {
 }
 
 #menuBtn:hover,
-#guideButton:hover,
+#guideButtonByGaoDe:hover,
+#guideButtonByApple:hover,
 #saveInfoBtn:hover,
 #submitComment:hover,
 #addMarkerBtn:hover {
